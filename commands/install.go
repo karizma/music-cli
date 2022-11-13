@@ -19,7 +19,6 @@ type InstallArgs struct {
 	ytdlArgs  string
 	name      string
 	musicPath string
-	editor    bool
 }
 
 func init() {
@@ -137,10 +136,6 @@ func installRunner(args *InstallArgs, positional []string) error {
 
 	if args.name != "" {
 		outputTemplate = args.name + ".%(ext)s"
-	}
-
-	if args.editor {
-
 	}
 
 	finalCmdArgs := []string{
