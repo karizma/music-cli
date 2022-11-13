@@ -65,6 +65,25 @@ func addFlags(playCmd *cobra.Command, args *PlayArgs) {
 
 	playCmd.Flags().IntVarP(&args.limit, "limit", "l", -1, "limit the amount of songs played")
 	playCmd.Flags().IntVar(&args.skip, "skip", 0, "songs to skip from the start")
+
+	playCmd.RegisterFlagCompletionFunc("sort-type", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+		return []string{"a", "c", "m"}, cobra.ShellCompDirectiveDefault
+	})
+
+	playCmd.RegisterFlagCompletionFunc("tags", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+		return nil, cobra.ShellCompDirectiveDefault
+	})
+
+	playCmd.RegisterFlagCompletionFunc("add-to-tag", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+		return tags.GetTagsCompletions(args.musicPath)
+	})
+
+	playCmd.RegisterFlagCompletionFunc("set-to-tag", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+		return tags.GetTagsCompletions(args.musicPath)
+	})
+
+	playCmd.MarkFlagDirname("music-path")
+	playCmd.MarkFlagFilename("vlc-path")
 }
 
 func generateCommand() (*cobra.Command, *PlayArgs) {

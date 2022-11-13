@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -36,12 +35,52 @@ func init() {
 				log.Fatal(err)
 			}
 		},
+		ValidArgsFunction: func(_ *cobra.Command, compWords []string, _ string) ([]string, cobra.ShellCompDirective) {
+			if len(compWords) == 0 {
+				return []string{"https://www.youtube.com/watch?v="}, cobra.ShellCompDirectiveDefault
+			} else if len(compWords) == 1 {
+				if args.musicPath == "" {
+					defaultMusicPath, err := stringUtils.GetDefaultMusicPath()
+
+					if err != nil {
+						return nil, cobra.ShellCompDirectiveDefault
+					}
+
+					args.musicPath = defaultMusicPath
+				}
+
+				entries, err := os.ReadDir(args.musicPath)
+
+				if err != nil {
+					return nil, cobra.ShellCompDirectiveDefault
+				}
+
+				dirs := make([]string, 0, len(entries))
+				re := regexp.MustCompile(`\s+`)
+
+				for _, dir := range entries {
+					if dir.IsDir() {
+						dirs = append(dirs, formatFolderName(dir.Name(), re))
+					}
+				}
+
+				return dirs, cobra.ShellCompDirectiveDefault
+			}
+
+			return nil, cobra.ShellCompDirectiveDefault
+		},
 	}
 
 	installCmd.Flags().StringVarP(&args.format, "format", "f", "m4a", "format to install to")
 	installCmd.Flags().StringVarP(&args.ytdlArgs, "ytdl-args", "y", "", "additional arguments to send to youtube-dl")
-	installCmd.Flags().StringVarP(&args.name, "name", "n", "", "the file name to install to")
+	installCmd.Flags().StringVarP(&args.name, "name", "n", "", "the file name to install to (no ext)")
 	installCmd.Flags().StringVarP(&args.musicPath, "music-path", "m", "", "the music path to use")
+
+	installCmd.RegisterFlagCompletionFunc("format", func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+		return []string{"3gp", "aac", "flv", "m4a", "mp3", "mp4", "ogg", "wav", "webm"}, cobra.ShellCompDirectiveDefault
+	})
+
+	installCmd.MarkFlagDirname("music-path")
 
 	rootCmd.AddCommand(installCmd)
 }
@@ -75,7 +114,6 @@ func installRunner(args *InstallArgs, positional []string) error {
 			continue
 		}
 
-		fmt.Println(formatFolderName(f.Name(), re))
 		if formatFolderName(f.Name(), re) == adjustedFolder {
 			if selectedFolder != "" {
 				return errors.New("folder matches more than one folder")

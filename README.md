@@ -12,11 +12,11 @@
 
 This is a simple command line tool to help with music-related tasks.
 The primary usage is the querying it provides which allows you to quickly
-select the songs you want to play. This is **not** a music player, it does
+select the songs you want to play. This is **not** a music player. It does
 not provide a TUI or GUI, and it uses VLC internally.
 
-For playlists and grouping of songs, it has a tag system. The tags and data are stored
-in your `$MUSIC_PATH/tags.json`.
+For playlists and grouping of songs, it has a tag system. The tags are stored
+in `$MUSIC_PATH/tags.json`.
 
 ## Requirements
 
@@ -39,9 +39,8 @@ I recommend a folder structure of:
 ```
 
 But this is not a necessary, as any file in your music path will be considered.
-
-Files should follow some basic file naming rules: no new lines, no crazy characters,
-etc.
+Files should follow some basic file naming rules: no new lines, no crazy
+characters, etc.
 
 ### Playing Music
 
@@ -114,7 +113,8 @@ and then using `--add-to-tag | -a <tag>` or `--set-to-tag | -s <tag>`.
 
 ### Installing music
 
-`music install "https://www.youtube.com/watch?v=K4DyBUG242c" ncs` => download from youtube
+`music install "https://www.youtube.com/watch?v=K4DyBUG242c" ncs` => download
+from youtube
 
 The first positional argument is the link to download or a youtube video id. The
 second is the child folder name of your music path to download to. The folder
@@ -130,19 +130,17 @@ Note: this program does not support piracy.
 This tool uses [cobra](https://github.com/spf13/cobra) which provides a
 completion command you can use to generate completions.
 
-It works fine, but it doesn't have reactive completion to a few things:
-tags, music subdirectory install, format, and sort-type.
+Before I used go & cobra I had my own implementation written in bash which can
+be found in `./completion.bash`. It's more static (faster but not in-sync) &
+less hand-holdy.
 
-The cobra provided completion is also a bit more descriptive than I personally
-like, which is why I use my own personal bash completion. It can be found in
-`./completion.bash`
+Choose whichever one you prefer.
 
-Note: I have `m` as an alias for `music` and `mx` as an alias for `music play`
+Notes if you plan on using my bash script:
 
-Note: You need `jq` if you want completions on `--add-to-tag|-a` or
-`--set-to-tag` or `music tags [tag]`
-
-It's also more static/hard-coded, so a bit more error-prone/inaccurate.
+-   there is a MUSIC_PATH variable at the start you may have to change
+-   I have `m` as an alias for `music` and `mx` as an alias for `music play`
+-   You need `jq` if you want tag completions
 
 ### Configuration
 

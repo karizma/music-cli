@@ -55,6 +55,32 @@ func GetStoredTags(musicPath string) (Tags, error) {
 	return storedTags, nil
 }
 
+func GetTagsCompletions(musicPath string) ([]string, cobra.ShellCompDirective) {
+	if musicPath == "" {
+		defaultMusicPath, err := stringUtils.GetDefaultMusicPath()
+
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveDefault
+		}
+
+		musicPath = defaultMusicPath
+	}
+
+	storedTags, err := GetStoredTags(musicPath)
+
+	if err != nil {
+		return nil, cobra.ShellCompDirectiveDefault
+	}
+
+	keys := []string{}
+
+	for k := range storedTags {
+		keys = append(keys, k)
+	}
+
+	return keys, cobra.ShellCompDirectiveDefault
+}
+
 func Setup(rootCmd *cobra.Command) {
 	args := TagsCommandArgs{}
 
@@ -68,11 +94,16 @@ func Setup(rootCmd *cobra.Command) {
 				log.Fatal(err)
 			}
 		},
+		ValidArgsFunction: func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			return GetTagsCompletions(args.musicPath)
+		},
 	}
 
 	tagsCmd.Flags().BoolVarP(&args.edit, "editor", "e", false, "edit tags.json or a specific tag with $EDITOR")
 	tagsCmd.Flags().BoolVarP(&args.shouldDelete, "delete", "d", false, "delete a tag")
 	tagsCmd.Flags().StringVarP(&args.musicPath, "music-path", "m", "", "the music path to use")
+
+	tagsCmd.MarkFlagDirname("music-path")
 
 	rootCmd.AddCommand(tagsCmd)
 }
