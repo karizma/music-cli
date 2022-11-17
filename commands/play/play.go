@@ -105,6 +105,10 @@ func setDefaultMusicPath(args *PlayArgs) error {
 		return err
 	}
 
+	if args.musicPath != "" {
+		return nil
+	}
+
 	args.musicPath = defaultMusicPath
 	return nil
 }
